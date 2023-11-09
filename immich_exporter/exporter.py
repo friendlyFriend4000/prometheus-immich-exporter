@@ -52,7 +52,7 @@ class ImmichMetricsCollector:
     def get_immich_users_stat_growth(self):
 
         try:
-            endpoint_user_stats = "/api/server-info/stats"
+            endpoint_user_stats = "/api/server-info/statistics"
             response_user_stats = requests.request(
                 "GET",
                 self.combine_url(endpoint_user_stats),
@@ -105,7 +105,7 @@ class ImmichMetricsCollector:
 
         global response_user_stats
         try:
-            endpoint_user_stats = "/api/server-info/stats"
+            endpoint_user_stats = "/api/server-info/statistics"
             response_user_stats = requests.request(
                 "GET",
                 self.combine_url(endpoint_user_stats),
