@@ -37,6 +37,7 @@ class ImmichMetricsCollector:
                 prom_metric = GaugeMetricFamily(name, help_text, labels=labels.keys())
             prom_metric.add_metric(value=value, labels=labels.values())
             yield prom_metric
+            logger.info(prom_metric)
 
     def get_immich_metrics(self):
 
@@ -321,7 +322,7 @@ def check_server_up(immichHost, immichPort):
     logger.info(f"Found immich up and running at " + immichHost + ":" + immichPort + ".")
     logger.info(f"Attempting to connect to immich")
     time.sleep(1)
-    logger.info("Exporter v1.0.6")
+    logger.info("Exporter v1.0.9")
 
 
 def check_immich_api_key(immichHost, immichPort, immichApiKey):
