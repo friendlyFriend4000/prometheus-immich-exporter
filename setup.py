@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setup(
     name='prometheus-immich-exporter',
     packages=['immich_exporter'],
-    version='1.0.9',
+    version='1.1.0',
     long_description=long_description,
     long_description_content_type="text/markdown",
     description='Prometheus exporter for immich',
@@ -18,7 +18,7 @@ setup(
     keywords=['prometheus', 'immich'],
     classifiers=[],
     python_requires='>=3',
-    install_requires=['attrdict==2.0.1', 'prometheus_client==0.12.0 ', 'requests==2.28.2', 'python-json-logger==2.0.2'],
+    install_requires=['attrdict==2.0.1', 'prometheus_client==0.19.0 ', 'requests==2.31.0', 'python-json-logger==2.0.7'],
     entry_points={
         'console_scripts': [
             'immich_exporter=immich_exporter.exporter:main',

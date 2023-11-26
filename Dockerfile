@@ -1,4 +1,4 @@
-FROM alpine:3.16.4
+FROM alpine:3.18.4
 
 # Installing required packages
 FROM alpine/doctl

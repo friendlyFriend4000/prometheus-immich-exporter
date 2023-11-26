@@ -49,7 +49,6 @@ class ImmichMetricsCollector:
 
         return metrics
 
-
     def get_immich_users_stat_growth(self):
 
         try:
@@ -63,24 +62,24 @@ class ImmichMetricsCollector:
         except requests.exceptions.RequestException as e:
             logger.error(f"Couldn't get server version: {e}")
 
-        userData = response_user_stats.json()["usageByUser"]
+        user_data = response_user_stats.json()["usageByUser"]
         # photos growth gauge
-        userCount = len(response_user_stats.json()["usageByUser"])
+        user_count = len(response_user_stats.json()["usageByUser"])
         photos_growth_total = 0
         videos_growth_total = 0
         usage_growth_total = 0
 
-        for x in range(0, userCount):
-            photos_growth_total += userData[x]["photos"]
+        for x in range(0, user_count):
+            photos_growth_total += user_data[x]["photos"]
             # total video growth
-            videos_growth_total += userData[x]["videos"]
+            videos_growth_total += user_data[x]["videos"]
             # total disk growth
-            usage_growth_total += userData[x]["usage"]
+            usage_growth_total += user_data[x]["usage"]
 
         return [
             {
                 "name": f"{self.config['metrics_prefix']}_server_stats_user_count",
-                "value": userCount,
+                "value": user_count,
                 "help": "number of users on the immich server"
             },
             {
@@ -122,53 +121,54 @@ class ImmichMetricsCollector:
         # To get the user count an api-endpoint exists but this works too. As a result one less api call is being made
 
         try:
-            userCount = len(response_user_stats.json()["usageByUser"])
+            user_count = len(response_user_stats.json()["usageByUser"])
         except Exception:
             logger.error("Is the Immich api token valid? Traceback:KeyError: 'usageByUser': ")
         # json array of all users with stats
-        # this line throws an error if api token is wrong. if the token is wrong or inavlid this will return a KeyError : 'usage by user'
-        userData = response_user_stats.json()["usageByUser"]
+        # this line throws an error if api token is wrong. if the token is wrong
+        # or invalid this will return a KeyError : 'usage by user'
+        user_data = response_user_stats.json()["usageByUser"]
 
-        for x in range(0, userCount):
+        for x in range(0, user_count):
             metrics.append(
 
                 {
                     "name": f"{self.config['metrics_prefix']}_server_stats_photos_by_users",
-                    "value": userData[x]['photos'],
+                    "value": user_data[x]['photos'],
                     "labels": {
-                        "firstName": userData[x]["userName"].split()[0],
+                        "firstName": user_data[x]["userName"].split()[0],
 
                     },
-                    "help": f"Number of photos by user {userData[x]['userName'].split()[0]} "
+                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
 
                 }
             )
 
         # videos
-        for x in range(0, userCount):
+        for x in range(0, user_count):
             metrics.append(
                 {
                     "name": f"{self.config['metrics_prefix']}_server_stats_videos_by_users",
-                    "value": userData[x]['videos'],
+                    "value": user_data[x]['videos'],
                     "labels": {
-                        "firstName": userData[x]["userName"].split()[0],
+                        "firstName": user_data[x]["userName"].split()[0],
 
                     },
-                    "help": f"Number of photos by user {userData[x]['userName'].split()[0]} "
+                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
 
                 }
             )
         # usage
-        for x in range(0, userCount):
+        for x in range(0, user_count):
             metrics.append(
                 {
                     "name": f"{self.config['metrics_prefix']}_server_stats_usage_by_users",
-                    "value": (userData[x]['usage']),
+                    "value": (user_data[x]['usage']),
                     "labels": {
-                        "firstName": userData[x]["userName"].split()[0],
+                        "firstName": user_data[x]["userName"].split()[0],
 
                     },
-                    "help": f"Number of photos by user {userData[x]['userName'].split()[0]} "
+                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
 
                 }
             )
@@ -294,10 +294,8 @@ def get_config_value(key, default=""):
 
 
 def check_server_up(immichHost, immichPort):
-
     #
     counter = 0
-
 
     while True:
         counter = counter + 1
@@ -310,7 +308,7 @@ def check_server_up(immichHost, immichPort):
             )
         except requests.exceptions.RequestException as e:
             logger.error(f"CONNECTION ERROR. Cannot reach immich at " + immichHost + ":" + immichPort + "."
-                         f"Is immich up and running?")
+                                                                                                        f"Is immich up and running?")
             if 0 <= counter <= 60:
                 time.sleep(1)
             elif 11 <= counter <= 300:
@@ -326,13 +324,12 @@ def check_server_up(immichHost, immichPort):
 
 
 def check_immich_api_key(immichHost, immichPort, immichApiKey):
-
     while True:
         try:
 
             requests.request(
                 "GET",
-                "http://"+immichHost+":"+immichPort+"/api/server-info/",
+                "http://" + immichHost + ":" + immichPort + "/api/server-info/",
                 headers={'Accept': 'application/json',
                          "x-api-key": immichApiKey}
             )
@@ -394,9 +391,7 @@ def main():
         f"Exporter listening on port {config['exporter_port']}"
     )
 
-
     while not signal_handler.is_shutting_down():
         time.sleep(1)
 
     logger.info("Exporter has shutdown")
-
