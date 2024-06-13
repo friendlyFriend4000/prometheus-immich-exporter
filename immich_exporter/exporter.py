@@ -43,7 +43,7 @@ class ImmichMetricsCollector:
 
         metrics = []
         metrics.extend(self.get_immich_server_version_number())
-        metrics.extend(self.get_immich_server_info())
+        metrics.extend(self.get_immich_storage())
         metrics.extend(self.get_immich_users_stat)
         metrics.extend(self.get_immich_users_stat_growth())
 
@@ -131,16 +131,13 @@ class ImmichMetricsCollector:
 
         for x in range(0, user_count):
             metrics.append(
-
                 {
                     "name": f"{self.config['metrics_prefix']}_server_stats_photos_by_users",
                     "value": user_data[x]['photos'],
                     "labels": {
                         "firstName": user_data[x]["userName"].split()[0],
-
                     },
                     "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
-
                 }
             )
 
@@ -152,10 +149,8 @@ class ImmichMetricsCollector:
                     "value": user_data[x]['videos'],
                     "labels": {
                         "firstName": user_data[x]["userName"].split()[0],
-
                     },
                     "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
-
                 }
             )
         # usage
@@ -166,49 +161,48 @@ class ImmichMetricsCollector:
                     "value": (user_data[x]['usage']),
                     "labels": {
                         "firstName": user_data[x]["userName"].split()[0],
-
                     },
                     "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
-
                 }
             )
 
         return metrics
 
-    def get_immich_server_info(self):
-
+    def get_immich_storage(self):
         try:
-            endpoint_server_info = "/api/server-info"
-            response_server_info = requests.request(
+            endpoint_storage = "/api/server-info/storage"
+            response_storage = requests.request(
                 "GET",
-                self.combine_url(endpoint_server_info),
+                self.combine_url(endpoint_storage),
                 headers={'Accept': 'application/json',
                          "x-api-key": self.config["token"]}
             )
         except requests.exceptions.RequestException as e:
-            logger.error(f"Couldn't get server version: {e}")
+            logger.error(f"Couldn't get storage info: {e}")
+            
+        response_json = response_storage.json()
 
         return [
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_diskAvailable",
-                "value": (response_server_info.json()["diskAvailableRaw"]),
+                "value": (response_json["diskAvailableRaw"]),
                 "help": "Available space on disk",
             },
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_totalDiskSize",
-                "value": (response_server_info.json()["diskSizeRaw"]),
+                "value": (response_json["diskSizeRaw"]),
                 "help": "total disk size",
                 # "type": "counter"
             },
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_diskUse",
-                "value": (response_server_info.json()["diskUseRaw"]),
+                "value": (response_json["diskUseRaw"]),
                 "help": "disk space in use",
                 # "type": "counter"
             },
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_diskUsagePercentage",
-                "value": (response_server_info.json()["diskUsagePercentage"]),
+                "value": (response_json["diskUsagePercentage"]),
                 "help": "disk usage in percent",
                 # "type": "counter"
             }
