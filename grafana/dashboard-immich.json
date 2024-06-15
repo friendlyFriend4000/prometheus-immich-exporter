@@ -113,12 +113,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "titleSize": 6
         },
-        "textMode": "name"
+        "textMode": "name",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -183,9 +185,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -245,9 +249,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -307,9 +313,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -369,9 +377,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -431,9 +441,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -453,6 +465,209 @@
       ],
       "title": "Remaining disk size",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "amount of CPU usage over time",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 3
+      },
+      "id": 51,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "immich_system_info_loadAverage",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{period}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Load Average",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Free memory over time",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 3
+      },
+      "id": 52,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "immich_system_info_memory{type=\"Free\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{type}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Free memory",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -482,7 +697,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 3
+        "y": 11
       },
       "hideTimeOverride": false,
       "id": 24,
@@ -498,9 +713,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -549,7 +766,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 3
+        "y": 11
       },
       "hideTimeOverride": false,
       "id": 26,
@@ -565,9 +782,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -611,7 +830,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 3
+        "y": 11
       },
       "id": 8,
       "options": {
@@ -684,7 +903,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 7
+        "y": 15
       },
       "hideTimeOverride": false,
       "id": 28,
@@ -700,9 +919,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -748,7 +969,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 7
+        "y": 15
       },
       "hideTimeOverride": false,
       "id": 30,
@@ -764,9 +985,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -810,7 +1033,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 11
+        "y": 19
       },
       "hideTimeOverride": false,
       "id": 32,
@@ -826,9 +1049,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -873,7 +1098,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 11
+        "y": 19
       },
       "hideTimeOverride": false,
       "id": 34,
@@ -889,9 +1114,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -936,7 +1163,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 11
+        "y": 19
       },
       "id": 4,
       "options": {
@@ -1012,7 +1239,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 15
+        "y": 23
       },
       "hideTimeOverride": false,
       "id": 36,
@@ -1028,9 +1255,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1076,7 +1305,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 15
+        "y": 23
       },
       "hideTimeOverride": false,
       "id": 38,
@@ -1092,9 +1321,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1124,6 +1355,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1175,7 +1407,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 27
       },
       "hideTimeOverride": false,
       "id": 22,
@@ -1220,6 +1452,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1271,7 +1504,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 26
+        "y": 34
       },
       "hideTimeOverride": false,
       "id": 47,
@@ -1332,7 +1565,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 33
+        "y": 41
       },
       "hideTimeOverride": false,
       "id": 42,
@@ -1348,9 +1581,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1396,7 +1631,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 33
+        "y": 41
       },
       "hideTimeOverride": false,
       "id": 40,
@@ -1412,9 +1647,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1457,7 +1694,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 33
+        "y": 41
       },
       "id": 6,
       "options": {
@@ -1530,7 +1767,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 37
+        "y": 45
       },
       "hideTimeOverride": false,
       "id": 44,
@@ -1546,9 +1783,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1594,7 +1833,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 37
+        "y": 45
       },
       "hideTimeOverride": false,
       "id": 46,
@@ -1610,9 +1849,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.5",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1642,6 +1883,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1693,7 +1935,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 41
+        "y": 49
       },
       "hideTimeOverride": false,
       "id": 49,
@@ -1738,6 +1980,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1789,7 +2032,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 56
       },
       "hideTimeOverride": false,
       "id": 50,
@@ -1832,13 +2075,13 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "immich",
   "uid": "ZWWp3aa4k",
-  "version": 31,
+  "version": 5,
   "weekStart": ""
 }

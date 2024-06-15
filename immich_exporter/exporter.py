@@ -5,6 +5,8 @@ import signal
 import faulthandler
 
 import requests
+import psutil
+
 from prometheus_client import start_http_server
 from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily, REGISTRY
 import logging
@@ -16,12 +18,22 @@ logger = logging.getLogger()
 
 
 class ImmichMetricsCollector:
-
     def __init__(self, config):
         self.config = config
 
-    def collect(self):
+    def request(self, endpoint):
+        response = requests.request(
+            "GET",
+            self.combine_url(endpoint),
+            headers={
+                "Accept": "application/json",
+                "x-api-key": self.config["token"]
+            }
+        )
+        return response
 
+
+    def collect(self):
         metrics = self.get_immich_metrics()
 
         for metric in metrics:
@@ -40,44 +52,61 @@ class ImmichMetricsCollector:
             logger.info(prom_metric)
 
     def get_immich_metrics(self):
-
         metrics = []
         metrics.extend(self.get_immich_server_version_number())
         metrics.extend(self.get_immich_storage())
-        metrics.extend(self.get_immich_users_stat)
-        metrics.extend(self.get_immich_users_stat_growth())
+        metrics.extend(self.get_immich_users_stat())
         metrics.extend(self.get_system_stats())
 
         return metrics
 
-    def get_immich_users_stat_growth(self):
-
+    def get_immich_users_stat(self):
         try:
             endpoint_user_stats = "/api/server-info/statistics"
-            response_user_stats = requests.request(
-                "GET",
-                self.combine_url(endpoint_user_stats),
-                headers={'Accept': 'application/json',
-                         "x-api-key": self.config["token"]}
-            )
+            response_user_stats = self.request(endpoint_user_stats).json()
         except requests.exceptions.RequestException as e:
-            logger.error(f"Couldn't get server version: {e}")
+            logger.error(f"API ERROR: can't get server statistic: {e}")
 
-        user_data = response_user_stats.json()["usageByUser"]
-        # photos growth gauge
-        user_count = len(response_user_stats.json()["usageByUser"])
+        user_data = response_user_stats["usageByUser"]
+        user_count = len(response_user_stats["usageByUser"])
         photos_growth_total = 0
         videos_growth_total = 0
         usage_growth_total = 0
 
+        metrics = []
+
         for x in range(0, user_count):
             photos_growth_total += user_data[x]["photos"]
-            # total video growth
             videos_growth_total += user_data[x]["videos"]
-            # total disk growth
             usage_growth_total += user_data[x]["usage"]
+            metrics.append(
+                {
+                    "name": f"{self.config['metrics_prefix']}_server_stats_photos_by_users",
+                    "value": user_data[x]['photos'],
+                    "labels": {"firstName": user_data[x]["userName"].split()[0]},
+                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
+                }
+            )
+            metrics.append(
+                {
+                    "name": f"{self.config['metrics_prefix']}_server_stats_videos_by_users",
+                    "value": user_data[x]['videos'],
+                    "labels": {"firstName": user_data[x]["userName"].split()[0]},
+                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
+                }
+            )
+            metrics.append(
+                {
+                    "name": f"{self.config['metrics_prefix']}_server_stats_usage_by_users",
+                    "value": (user_data[x]['usage']),
+                    "labels": {
+                        "firstName": user_data[x]["userName"].split()[0],
+                    },
+                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
+                }
+            )
 
-        return [
+        metrics += [
             {
                 "name": f"{self.config['metrics_prefix']}_server_stats_user_count",
                 "value": user_count,
@@ -97,113 +126,39 @@ class ImmichMetricsCollector:
                 "name": f"{self.config['metrics_prefix']}_server_stats_usage_growth",
                 "value": usage_growth_total,
                 "help": "videos counter that is added or removed"
-            }
-
+            },
         ]
-
-    @property
-    def get_immich_users_stat(self):
-
-        global response_user_stats
-        try:
-            endpoint_user_stats = "/api/server-info/statistics"
-            response_user_stats = requests.request(
-                "GET",
-                self.combine_url(endpoint_user_stats),
-                headers={'Accept': 'application/json',
-                         "x-api-key": self.config["token"]}
-            )
-        except requests.exceptions.RequestException as e:
-            logger.error(f"API ERROR: can't get server statistic: {e}")
-            logger.info(f"API TOKEN CORRECT?")
-            logger.info(f"API ENDPOINT CHANGED?")
-
-        metrics = []
-        # To get the user count an api-endpoint exists but this works too. As a result one less api call is being made
-
-        try:
-            user_count = len(response_user_stats.json()["usageByUser"])
-        except Exception:
-            logger.error("Is the Immich api token valid? Traceback:KeyError: 'usageByUser': ")
-        # json array of all users with stats
-        # this line throws an error if api token is wrong. if the token is wrong
-        # or invalid this will return a KeyError : 'usage by user'
-        user_data = response_user_stats.json()["usageByUser"]
-
-        for x in range(0, user_count):
-            metrics.append(
-                {
-                    "name": f"{self.config['metrics_prefix']}_server_stats_photos_by_users",
-                    "value": user_data[x]['photos'],
-                    "labels": {
-                        "firstName": user_data[x]["userName"].split()[0],
-                    },
-                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
-                }
-            )
-
-        # videos
-        for x in range(0, user_count):
-            metrics.append(
-                {
-                    "name": f"{self.config['metrics_prefix']}_server_stats_videos_by_users",
-                    "value": user_data[x]['videos'],
-                    "labels": {
-                        "firstName": user_data[x]["userName"].split()[0],
-                    },
-                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
-                }
-            )
-        # usage
-        for x in range(0, user_count):
-            metrics.append(
-                {
-                    "name": f"{self.config['metrics_prefix']}_server_stats_usage_by_users",
-                    "value": (user_data[x]['usage']),
-                    "labels": {
-                        "firstName": user_data[x]["userName"].split()[0],
-                    },
-                    "help": f"Number of photos by user {user_data[x]['userName'].split()[0]} "
-                }
-            )
 
         return metrics
 
     def get_immich_storage(self):
         try:
             endpoint_storage = "/api/server-info/storage"
-            response_storage = requests.request(
-                "GET",
-                self.combine_url(endpoint_storage),
-                headers={'Accept': 'application/json',
-                         "x-api-key": self.config["token"]}
-            )
+            response_storage = self.request(endpoint_storage).json()
         except requests.exceptions.RequestException as e:
             logger.error(f"Couldn't get storage info: {e}")
-
-        response_json = response_storage.json()
 
         return [
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_diskAvailable",
-                "value": (response_json["diskAvailableRaw"]),
+                "value": (response_storage["diskAvailableRaw"]),
                 "help": "Available space on disk",
             },
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_totalDiskSize",
-                "value": (response_json["diskSizeRaw"]),
+                "value": (response_storage["diskSizeRaw"]),
                 "help": "total disk size",
                 # "type": "counter"
             },
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_diskUse",
-                "value": (response_json["diskUseRaw"]),
+                "value": (response_storage["diskUseRaw"]),
                 "help": "disk space in use",
                 # "type": "counter"
             },
             {
                 "name": f"{self.config['metrics_prefix']}_server_info_diskUsagePercentage",
-                "value": (response_json["diskUsagePercentage"]),
+                "value": (response_storage["diskUsagePercentage"]),
                 "help": "disk usage in percent",
                 # "type": "counter"
             }
@@ -220,22 +175,15 @@ class ImmichMetricsCollector:
 
         while True:
             try:
-
-                response_server_version = requests.request(
-                    "GET",
-                    self.combine_url(server_version_endpoint),
-                    headers={'Accept': 'application/json',
-                             "x-api-key": self.config["token"]}
-                )
+                response = self.request(server_version_endpoint).json()
             except requests.exceptions.RequestException as e:
                 logger.error(f"Couldn't get server version")
                 continue
             break
 
-        server_version_number = (str(response_server_version.json()["major"]) + "." +
-                                 str(response_server_version.json()["minor"]) + "." +
-                                 str(response_server_version.json()["patch"])
-                                 )
+        server_version_number = (
+            str(response["major"]) + "." + str(response["minor"]) + "." + str(response["patch"])
+        )
 
         return [
             {
@@ -249,24 +197,55 @@ class ImmichMetricsCollector:
 
     def get_system_stats(self):
         loadAvg = os.getloadavg()
+        virtualMem = psutil.virtual_memory()
         return [
             {
-                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage_1",
-                "value": (loadAvg[0]),
+                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage",
+                "value": loadAvg[0],
                 "help": "CPU Load average 1m",
-                "labels": {"Load Average": "1m"},
+                "labels": {"period": "1m"},
             },
             {
-                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage_5",
-                "value": (loadAvg[1]),
+                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage",
+                "value": loadAvg[1],
                 "help": "CPU Load average 5m",
-                "labels": {"Load Average": "5m"},
+                "labels": {"period": "5m"},
             },
             {
-                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage_15",
-                "value": (loadAvg[2]),
+                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage",
+                "value": loadAvg[2],
                 "help": "CPU Load average 15m",
-                "labels": {"Load Average": "15m"},
+                "labels": {"period": "15m"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_memory",
+                "value": virtualMem[0],
+                "help": "Virtual Memory - Total",
+                "labels": {"type": "Total"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_memory",
+                "value": virtualMem[1],
+                "help": "Virtual Memory - Available",
+                "labels": {"type": "Available"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_memory",
+                "value": virtualMem[2],
+                "help": "Virtual Memory - Percent",
+                "labels": {"type": "Percent"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_memory",
+                "value": virtualMem[3],
+                "help": "Virtual Memory - Used",
+                "labels": {"type": "Used"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_memory",
+                "value": virtualMem[4],
+                "help": "Virtual Memory - Free",
+                "labels": {"type": "Free"},
             },
         ]
 
@@ -274,7 +253,7 @@ class ImmichMetricsCollector:
         prefix_url = "http://"
         base_url = self.config["immich_host"]
         base_url_port = self.config["immich_port"]
-        combined_url = prefix_url + base_url + ":" + base_url_port + api_endpoint
+        combined_url = f"{prefix_url}{base_url}:{base_url_port}{api_endpoint}"
 
         return combined_url
 
@@ -312,21 +291,19 @@ def get_config_value(key, default=""):
 
 
 def check_server_up(immichHost, immichPort):
-    #
     counter = 0
 
     while True:
         counter = counter + 1
         try:
-
             requests.request(
                 "GET",
-                "http://" + immichHost + ":" + immichPort + "/api/server-info/ping",
+                f"http://{immichHost}:{immichPort}/api/server-info/ping",
                 headers={'Accept': 'application/json'}
             )
         except requests.exceptions.RequestException as e:
-            logger.error(f"CONNECTION ERROR. Cannot reach immich at " + immichHost + ":" + immichPort + "."
-                                                                                                        f"Is immich up and running?")
+            logger.error(
+                f"CONNECTION ERROR. Cannot reach immich at {immichHost}:{immichPort}. Is immich up and running?")
             if 0 <= counter <= 60:
                 time.sleep(1)
             elif 11 <= counter <= 300:
@@ -335,21 +312,22 @@ def check_server_up(immichHost, immichPort):
                 time.sleep(60)
             continue
         break
-    logger.info(f"Found immich up and running at " + immichHost + ":" + immichPort + ".")
-    logger.info(f"Attempting to connect to immich")
+    logger.info(f"Found immich up and running at {immichHost}:{immichPort}.")
+    logger.info("Attempting to connect to immich")
     time.sleep(1)
-    logger.info("Exporter v1.0.9")
+    logger.info("Exporter 1.2.0")
 
 
 def check_immich_api_key(immichHost, immichPort, immichApiKey):
     while True:
         try:
-
             requests.request(
                 "GET",
-                "http://" + immichHost + ":" + immichPort + "/api/server-info/",
-                headers={'Accept': 'application/json',
-                         "x-api-key": immichApiKey}
+                f"http://{immichHost}:{immichPort}/api/server-info/",
+                headers={
+                    "Accept": "application/json",
+                    "x-api-key": immichApiKey
+                }
             )
         except requests.exceptions.RequestException as e:
             logger.error(f"CONNECTION ERROR. Possible API key error")

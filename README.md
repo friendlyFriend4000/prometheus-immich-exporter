@@ -50,7 +50,12 @@ These are the metrics this program exports, assuming the `METRICS_PREFIX` is `im
 | `immich_server_stats_videos_growth`   | `sum of all videos of all users`            |
 | `immich_server_stats_usage_by_users`  | `the disk space each user uses`             |
 | `immich_server_stats_usage_growth`    | `sum of disk space taken up by all users`   |
-           
+
+| `metric name`                         | `description`                                                    |
+|---------------------------------------|------------------------------------------------------------------|
+| `immich_system_info_loadAverage`      | `array of load average (1m, 5m 15m)`                             |     
+| `immich_system_info_memory`           | `array of memory states (Total, Available, Percent, Used, Free)` |     
+
 
 ## Screenshot
 
