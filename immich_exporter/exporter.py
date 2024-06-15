@@ -46,6 +46,7 @@ class ImmichMetricsCollector:
         metrics.extend(self.get_immich_storage())
         metrics.extend(self.get_immich_users_stat)
         metrics.extend(self.get_immich_users_stat_growth())
+        metrics.extend(self.get_system_stats())
 
         return metrics
 
@@ -179,7 +180,7 @@ class ImmichMetricsCollector:
             )
         except requests.exceptions.RequestException as e:
             logger.error(f"Couldn't get storage info: {e}")
-            
+
         response_json = response_storage.json()
 
         return [
@@ -244,6 +245,29 @@ class ImmichMetricsCollector:
                 "labels": {"version": server_version_number}
 
             }
+        ]
+
+    def get_system_stats(self):
+        loadAvg = os.getloadavg()
+        return [
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage_1",
+                "value": (loadAvg[0]),
+                "help": "CPU Load average 1m",
+                "labels": {"Load Average": "1m"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage_5",
+                "value": (loadAvg[1]),
+                "help": "CPU Load average 5m",
+                "labels": {"Load Average": "5m"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_loadAverage_15",
+                "value": (loadAvg[2]),
+                "help": "CPU Load average 15m",
+                "labels": {"Load Average": "15m"},
+            },
         ]
 
     def combine_url(self, api_endpoint):
