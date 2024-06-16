@@ -198,6 +198,7 @@ class ImmichMetricsCollector:
     def get_system_stats(self):
         loadAvg = os.getloadavg()
         virtualMem = psutil.virtual_memory()
+        cpu = psutil.cpu_percent(interval=1, percpu=False)
         return [
             {
                 "name": f"{self.config['metrics_prefix']}_system_info_loadAverage",
@@ -246,6 +247,11 @@ class ImmichMetricsCollector:
                 "value": virtualMem[4],
                 "help": "Virtual Memory - Free",
                 "labels": {"type": "Free"},
+            },
+            {
+                "name": f"{self.config['metrics_prefix']}_system_info_cpu_usage",
+                "value": cpu,
+                "help": "Representing the current system-wide CPU utilization as a percentage",
             },
         ]
 
