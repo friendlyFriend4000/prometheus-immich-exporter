@@ -8,13 +8,33 @@ A prometheus exporter for Immich. Get metrics from a server and offers them in a
 Here is an example docker run command
 
 ```
-docker run -e IMMICH_PORT=8080 -e IMMICH_HOST=192.168.178.1 -e IMMICH_API_TOKEN=TOKEN -p 8000:8000 friendlyfriend/prometheus-immich-exporter
+docker run -e IMMICH_PORT=8080 -e IMMICH_HOST=192.168.178.1 -e IMMICH_API_TOKEN=<TOKEN> -p 8000:8000 alexf007/prometheus-immich-exporter
 ```
+Or you can add the following to your immich docker-compose.yaml
+```
+  immich-exporter:
+    image: alexf007/prometheus-immich-exporter
+    container_name: immich_exporter
+    environment:
+      - IMMICH_PORT=3001
+      - IMMICH_HOST=immich-server
+      - IMMICH_API_TOKEN=<TOKEN>
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+```
+
 Add this to your prometheus.yml
 ```
-  - job_name: "Immich_exporter"
+  - job_name: "immich_exporter"
     static_configs:
         - targets: ['yourimmichexporter:port']
+```
+In case if you run prometheus from the same docker-compose you can use this job
+```
+  - job_name: immich_exporter
+    static_configs:
+        - targets: ['immich-exporter:8000']
 ```
 The application reads configuration using environment variables:
 
