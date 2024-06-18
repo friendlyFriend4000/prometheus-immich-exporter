@@ -12,8 +12,8 @@ WORKDIR /code
 COPY . .
 RUN pip3 install --break-system-packages .
 
-ENV IMMICH_API_TOKEN=""
-ENV IMMICH_HOST=""
+ENV IMMICH_API_TOKEN="yourimmichtokenhere"
+ENV IMMICH_HOST="host/ip"
 ENV IMMICH_PORT="8080"
 #has to be EXPORT_PORT 8000 or else it does not work, same applies to the env file
 ENV EXPORTER_PORT="8000"
