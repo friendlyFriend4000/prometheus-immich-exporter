@@ -34,6 +34,7 @@ class ImmichMetricsCollector:
 
 
     def collect(self):
+        logger.info("Requested the metrics")
         metrics = self.get_immich_metrics()
 
         for metric in metrics:
@@ -49,7 +50,7 @@ class ImmichMetricsCollector:
                 prom_metric = GaugeMetricFamily(name, help_text, labels=labels.keys())
             prom_metric.add_metric(value=value, labels=labels.values())
             yield prom_metric
-            logger.info(prom_metric)
+            logger.debug(prom_metric)
 
     def get_immich_metrics(self):
         metrics = []
