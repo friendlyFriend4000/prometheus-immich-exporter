@@ -322,7 +322,7 @@ def check_server_up(immichHost, immichPort):
     logger.info(f"Found immich up and running at {immichHost}:{immichPort}.")
     logger.info("Attempting to connect to immich")
     time.sleep(1)
-    logger.info("Exporter 1.2.0")
+    logger.info("Exporter 1.2.1")
 
 
 def check_immich_api_key(immichHost, immichPort, immichApiKey):
