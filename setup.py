@@ -3,7 +3,7 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-version = '1.2.0'
+version = '1.2.1'
 
 setup(
     name='prometheus-immich-exporter',
