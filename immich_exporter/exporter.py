@@ -63,7 +63,7 @@ class ImmichMetricsCollector:
 
     def get_immich_users_stat(self):
         try:
-            endpoint_user_stats = "/api/server-info/statistics"
+            endpoint_user_stats = "/api/server/statistics"
             response_user_stats = self.request(endpoint_user_stats).json()
         except requests.exceptions.RequestException as e:
             logger.error(f"API ERROR: can't get server statistic: {e}")
@@ -134,7 +134,7 @@ class ImmichMetricsCollector:
 
     def get_immich_storage(self):
         try:
-            endpoint_storage = "/api/server-info/storage"
+            endpoint_storage = "/api/server/storage"
             response_storage = self.request(endpoint_storage).json()
         except requests.exceptions.RequestException as e:
             logger.error(f"Couldn't get storage info: {e}")
@@ -171,7 +171,7 @@ class ImmichMetricsCollector:
         #   2. check if immich api key is correct
         # throwing connectionRefused exception usually means that immich isn't running
 
-        server_version_endpoint = "/api/server-info/version"
+        server_version_endpoint = "/api/server/version"
         response_server_version = ""
 
         while True:
@@ -305,7 +305,7 @@ def check_server_up(immichHost, immichPort):
         try:
             requests.request(
                 "GET",
-                f"http://{immichHost}:{immichPort}/api/server-info/ping",
+                f"http://{immichHost}:{immichPort}/api/server/ping",
                 headers={'Accept': 'application/json'}
             )
         except requests.exceptions.RequestException as e:
@@ -330,7 +330,7 @@ def check_immich_api_key(immichHost, immichPort, immichApiKey):
         try:
             requests.request(
                 "GET",
-                f"http://{immichHost}:{immichPort}/api/server-info/",
+                f"http://{immichHost}:{immichPort}/api/server/",
                 headers={
                     "Accept": "application/json",
                     "x-api-key": immichApiKey
