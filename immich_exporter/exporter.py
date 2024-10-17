@@ -63,7 +63,7 @@ class ImmichMetricsCollector:
 
     def get_immich_users_stat(self):
         try:
-            endpoint_user_stats = "/api/server-info/statistics"
+            endpoint_user_stats = "/statistics"
             response_user_stats = self.request(endpoint_user_stats).json()
         except requests.exceptions.RequestException as e:
             logger.error(f"API ERROR: can't get server statistic: {e}")
@@ -134,7 +134,7 @@ class ImmichMetricsCollector:
 
     def get_immich_storage(self):
         try:
-            endpoint_storage = "/api/server-info/storage"
+            endpoint_storage = "/storage"
             response_storage = self.request(endpoint_storage).json()
         except requests.exceptions.RequestException as e:
             logger.error(f"Couldn't get storage info: {e}")
@@ -171,7 +171,7 @@ class ImmichMetricsCollector:
         #   2. check if immich api key is correct
         # throwing connectionRefused exception usually means that immich isn't running
 
-        server_version_endpoint = "/api/server-info/version"
+        server_version_endpoint = "/version"
         response_server_version = ""
 
         while True:
@@ -260,7 +260,8 @@ class ImmichMetricsCollector:
         prefix_url = "http://"
         base_url = self.config["immich_host"]
         base_url_port = self.config["immich_port"]
-        combined_url = f"{prefix_url}{base_url}:{base_url_port}{api_endpoint}"
+        base_api_endpoint = "/api/server"
+        combined_url = f"{prefix_url}{base_url}:{base_url_port}{base_api_endpoint}{api_endpoint}"
 
         return combined_url
 
