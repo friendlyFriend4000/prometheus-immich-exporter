@@ -8,7 +8,7 @@ A prometheus exporter for Immich. Get metrics from a server and offers them in a
 Here is an example docker run command
 
 ```
-docker run -e IMMICH_PORT=8080 -e IMMICH_HOST=192.168.178.1 -e IMMICH_API_TOKEN=<TOKEN> -p 8000:8000 friendlyfriend/prometheus-immich-exporter
+docker run -e IMMICH_PORT=8080 -e IMMICH_HOST=192.168.178.1 -e IMMICH_API_TOKEN=YOUR_TOKEN_HERE -p 8000:8000 friendlyfriend/prometheus-immich-exporter
 ```
 Or you can add the following to your immich docker-compose.yaml
 ```
