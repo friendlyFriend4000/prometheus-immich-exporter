@@ -1,6 +1,8 @@
 # This project has been retired in favor of [ImmichStat](https://github.com/friendlyFriend4000/ImmichStat)
 
 
+
+
 ## Prometheus Immich exporter
 [More info](./grafana/README.md)
 A prometheus exporter for Immich. Get metrics from a server and offers them in a prometheus format.
