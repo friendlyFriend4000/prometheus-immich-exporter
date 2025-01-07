@@ -1,16 +1,6 @@
-FROM alpine:3.18.4
+FROM python:3.11-slim-bookworm
 
-# Installing required packages
-FROM alpine/doctl
 ENV PYTHONUNBUFFERED=1
-RUN apk add --update --no-cache python3 py-pip gcc python3-dev musl-dev linux-headers && ln -sf python3 /usr/bin/python
-#RUN python3 -m ensurepip
-RUN pip3 install --break-system-packages --no-cache --upgrade pip setuptools
-
-# Install package
-WORKDIR /code
-COPY . .
-RUN pip3 install --break-system-packages .
 
 ENV IMMICH_API_TOKEN="yourimmichtokenhere"
 ENV IMMICH_HOST="host/ip"
@@ -19,4 +9,25 @@ ENV IMMICH_PORT="2283"
 ENV EXPORTER_PORT="8000"
 ENV EXPORTER_LOG_LEVEL="INFO"
 
-ENTRYPOINT ["immich_exporter"]
+# Install package
+WORKDIR /code
+COPY . .
+
+# arm64 needs gcc and python3-dev for `pip3 install`
+# python version in python3-dev from bookworm is 3.11 (used same python verion in FROM)
+# amd64 python image version has all dependencies installed already
+
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        apt-get update  \
+        && apt-get install -y --no-install-recommends gcc python3-dev  \
+        && pip3 install --no-cache-dir .  \
+        && apt-get remove -y --purge gcc python3-dev  \
+        && apt-get autoremove -y  \
+        && apt-get clean  \
+        && rm -rf /var/lib/apt/lists/* ; \
+else \
+    pip3 install --no-cache-dir . ; \
+fi
+
+ENTRYPOINT [ "immich_exporter" ]

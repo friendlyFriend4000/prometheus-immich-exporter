@@ -1,5 +1,7 @@
 __pycache__/
 .coverage*
+.git
+.idea
 .github
 .gitignore
 .pdm*
